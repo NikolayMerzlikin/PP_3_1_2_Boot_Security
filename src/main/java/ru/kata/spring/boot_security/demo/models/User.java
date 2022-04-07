@@ -32,12 +32,10 @@ public class User implements UserDetails {
     @Column/*(nullable = false)*/
     private String password;
 
-    @ElementCollection(targetClass = Roles.class, fetch = FetchType.EAGER)
-    @CollectionTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"))
-    @Enumerated(EnumType.STRING)
-    private Set<? extends GrantedAuthority> roles;
+    @ManyToMany(fetch = FetchType.EAGER, cascade=CascadeType.ALL)
+    private Set<Role> roles;
 
-    public User(String username, int age, String email, String password, Set<Roles> role) {
+    public User(String username, int age, String email, String password, Set<Role> role) {
         this.username = username;
         this.age = age;
         this.email = email;
@@ -47,7 +45,7 @@ public class User implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return roles.stream().map(el -> new SimpleGrantedAuthority(el.getAuthority())).collect(Collectors.toList());
+        return roles.stream().map(el -> new SimpleGrantedAuthority("ROLE_" + el.getAuthority())).collect(Collectors.toList());
     }
 
     @Override

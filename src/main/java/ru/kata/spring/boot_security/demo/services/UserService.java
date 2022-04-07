@@ -9,6 +9,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import ru.kata.spring.boot_security.demo.models.Role;
 import ru.kata.spring.boot_security.demo.models.Roles;
 import ru.kata.spring.boot_security.demo.models.User;
 import ru.kata.spring.boot_security.demo.repositories.UserRepository;
@@ -29,21 +30,30 @@ public class UserService implements UserDetailsService {
     public UserService(PasswordEncoder passwordEncoder, UserRepository userRepository) {
         this.passwordEncoder = passwordEncoder;
         this.userRepository = userRepository;
-        Set<Roles> temp = new HashSet<>();
-        temp.add(Roles.ADMIN);
+
+        Set<Role> temp = new HashSet<>();
+        Role role = new Role();
+        role.setRole("ADMIN");
+        temp.add(role);
         User admin = new User("admin", 40, "admin@mail.ru",
                 "123", temp);
         admin.setPassword(new BCryptPasswordEncoder().encode(admin.getPassword()));
         userRepository.save(admin);
         temp.clear();
-        temp.add(Roles.USER);
+        role = new Role();
+        role.setRole("USER");
+        temp.add(role);
         User user = new User("user", 40, "user@mail.ru",
                 "123", temp);
         user.setPassword(new BCryptPasswordEncoder().encode(user.getPassword()));
         userRepository.save(user);
         temp.clear();
-        temp.add(Roles.USER);
-        temp.add(Roles.ADMIN);
+        role = new Role();
+        role.setRole("ADMIN");
+        temp.add(role);
+        role = new Role();
+        role.setRole("USER");
+        temp.add(role);
         User sup = new User("sup", 40, "sup@mail.ru",
                 "123", temp);
         sup.setPassword(new BCryptPasswordEncoder().encode(sup.getPassword()));
@@ -68,9 +78,9 @@ public class UserService implements UserDetailsService {
         if (user == null) {
             throw new UsernameNotFoundException(String.format("User %s not found", username));
         }
-        Set<GrantedAuthority> grantedAuthorities = new HashSet<>();
-        user.getRoles().forEach(role -> grantedAuthorities.add(new SimpleGrantedAuthority("ROLE_" + role.getAuthority())));
-        user.setRoles(grantedAuthorities);
+//        Set<? extends GrantedAuthority> grantedAuthorities = new HashSet<>();
+//        user.getRoles().forEach(role -> grantedAuthorities.add(new SimpleGrantedAuthority("ROLE_" + role.getAuthority())));
+//        user.setRoles(grantedAuthorities);
         return user;
     }
 
