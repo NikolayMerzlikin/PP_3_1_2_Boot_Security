@@ -7,13 +7,14 @@ import org.springframework.web.bind.annotation.*;
 import ru.kata.spring.boot_security.demo.models.User;
 import ru.kata.spring.boot_security.demo.services.UserService;
 
+import javax.transaction.Transactional;
 import java.security.Principal;
 import java.util.List;
 
 @Controller
 @RequestMapping("/admin")
 public class AdminController {
-    private UserService userService;
+    private final UserService userService;
 
     @Autowired
     public AdminController(UserService userService) {
@@ -23,7 +24,6 @@ public class AdminController {
     @GetMapping("/")
     public String admin(Model model, Principal principal) {
         List<User> list = userService.findAll();
-        // User user = userService.findUserByUserName(principal.getName());
         model.addAttribute("Users", list);
         return "user";
     }
@@ -35,12 +35,14 @@ public class AdminController {
     }
 
     @PostMapping(value = "/add")
+    @Transactional
     public String addNewUser(@ModelAttribute("newUser") User user) {
         userService.save(user);
         return "redirect:/";
     }
 
     @GetMapping(value = "/edit/{id}")
+    @Transactional
     public String edit(@PathVariable(name = "id") Long id, Model model) {
         User user = userService.findById(id).get();
         model.addAttribute("user", user);
@@ -48,6 +50,7 @@ public class AdminController {
     }
 
     @PostMapping(value = "/edit/")
+    @Transactional
     public String editUser(@ModelAttribute(value = "user") User user) {
         userService.edit(user);
         return "redirect:/admin/";

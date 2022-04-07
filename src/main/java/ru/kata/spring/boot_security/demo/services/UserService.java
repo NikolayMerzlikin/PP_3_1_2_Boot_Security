@@ -1,6 +1,8 @@
 package ru.kata.spring.boot_security.demo.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -20,8 +22,8 @@ import java.util.Set;
 
 @Service
 public class UserService implements UserDetailsService {
-    private UserRepository userRepository;
-    private PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
     public UserService(PasswordEncoder passwordEncoder, UserRepository userRepository) {
@@ -51,9 +53,12 @@ public class UserService implements UserDetailsService {
 
     @Transactional
     public User findUserByUserName(String username) {
+
         return userRepository.findByUsername(username);
     }
+
     public List<User> findAll() {
+
         return userRepository.findAll();
     }
 
@@ -63,16 +68,17 @@ public class UserService implements UserDetailsService {
         if (user == null) {
             throw new UsernameNotFoundException(String.format("User %s not found", username));
         }
-        //org.springframework.security.core.userdetails.User u = new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), user.getAuthorities());
+        Set<GrantedAuthority> grantedAuthorities = new HashSet<>();
+        user.getRoles().forEach(role -> grantedAuthorities.add(new SimpleGrantedAuthority("ROLE_" + role.getAuthority())));
+        user.setRoles(grantedAuthorities);
         return user;
     }
 
-//    private Collection<? extends GrantedAuthority> rolesToAuthtorities(Collection<Role> roles) {
-//        return roles.stream().map(el -> new SimpleGrantedAuthority(el.getRole())).collect(Collectors.toList());
-//    }
     public Optional<User> findById(long id) {
+
         return userRepository.findById(id);
     }
+
     public void save(User user) {
         User extracted = userRepository.findByUsername(user.getUsername());
         if (extracted != null) {
@@ -82,8 +88,9 @@ public class UserService implements UserDetailsService {
             userRepository.save(user);
         }
     }
+
     public void edit(User user) {
-        User extracted = userRepository.findById(user.getId()).orElseThrow(()-> new IllegalArgumentException("Edited User not exists!"));
+        User extracted = userRepository.findById(user.getId()).orElseThrow(() -> new IllegalArgumentException("Edited User not exists!"));
         extracted.setUsername(user.getUsername());
         extracted.setAge(user.getAge());
         extracted.setEmail(user.getEmail());

@@ -30,11 +30,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http
                 .csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/", "/index").permitAll()
                 .antMatchers("/admin/**").hasRole("ADMIN")
-                .antMatchers("/user").hasRole("USER")
-                //.antMatchers("/admin/**").hasAuthority("ROLE_ADMIN")
-                //.antMatchers("/user").hasAnyAuthority("ROLE_ADMIN", "ROLE_USER")
+                .antMatchers("/user").hasAnyRole("USER", "ADMIN")
+                .antMatchers("/", "/index").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .formLogin().successHandler(successUserHandler)
@@ -43,48 +41,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .logout().logoutSuccessUrl("/")
                 .permitAll();
     }
+
     @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception
-    {
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.userDetailsService(userService).passwordEncoder(passwordEncoder);
     }
-
-//    @Bean
-//    public DaoAuthenticationProvider daoAuthenticationProvider() {
-//        DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider();
-//        daoAuthenticationProvider.setPasswordEncoder(passwordEncoder);
-//        daoAuthenticationProvider.setUserDetailsService(userService);
-//        return daoAuthenticationProvider;
-//    }
-
-//    @Bean
-//    public JdbcUserDetailsManager userJDBC(DataSource dataSource) {
-//        UserDetails user =
-//                User.builder()
-//                        .username("user")
-//                        .password("{bcrypt}$2a$12$WbOlOW5x/ehjq24JpAdbZufuBpqhsFGx1fS40LuK/RyYglp.8Dn9i")
-//                        .roles("USER")
-//                        .build();
-//        UserDetails admin =
-//                User.builder()
-//                        .username("admin")
-//                        .password("{bcrypt}$2a$12$Bd1bye9EjIu3y83tUQ//su53hSQ5ukI3e.M0jQzfc5V5dvXaFpXcG")
-//                        .roles("USER", "ADMIN")
-//                        .build();
-//        JdbcUserDetailsManager jdbcUserDetailsManager = new JdbcUserDetailsManager(dataSource);
-//        if (jdbcUserDetailsManager.userExists(user.getUsername())) {
-//            jdbcUserDetailsManager.deleteUser(user.getUsername());
-//        }
-//        if (jdbcUserDetailsManager.userExists(admin.getUsername())) {
-//            jdbcUserDetailsManager.deleteUser(admin.getUsername());
-//        }
-//        jdbcUserDetailsManager.createUser(user);
-//        jdbcUserDetailsManager.createUser(admin);
-//
-//        return  jdbcUserDetailsManager;
-//    }
-
-
-
 
 }

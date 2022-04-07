@@ -32,15 +32,10 @@ public class User implements UserDetails {
     @Column/*(nullable = false)*/
     private String password;
 
-    //    @ManyToMany(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
-//    @JoinTable(name = "role_user",
-//            joinColumns = @JoinColumn(name = "role_id"),
-//            inverseJoinColumns = @JoinColumn(name = "user_id"))
     @ElementCollection(targetClass = Roles.class, fetch = FetchType.EAGER)
     @CollectionTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"))
     @Enumerated(EnumType.STRING)
-    private Set<Roles> roles;
-
+    private Set<? extends GrantedAuthority> roles;
 
     public User(String username, int age, String email, String password, Set<Roles> role) {
         this.username = username;
@@ -52,7 +47,7 @@ public class User implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return roles/*.stream().map(el -> new SimpleGrantedAuthority(el.getAuthority())).collect(Collectors.toList())*/;
+        return roles.stream().map(el -> new SimpleGrantedAuthority(el.getAuthority())).collect(Collectors.toList());
     }
 
     @Override

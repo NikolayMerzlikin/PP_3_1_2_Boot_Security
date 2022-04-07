@@ -12,7 +12,7 @@ import java.util.List;
 
 @Controller
 public class UserController {
-    private UserService userService;
+    private final UserService userService;
 
     @Autowired
     public UserController(UserService userService) {
@@ -21,6 +21,7 @@ public class UserController {
 
     @GetMapping("/")
     public String index() {
+
         return "index";
     }
 
