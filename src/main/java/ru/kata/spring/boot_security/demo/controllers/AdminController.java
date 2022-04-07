@@ -4,12 +4,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import ru.kata.spring.boot_security.demo.models.Role;
 import ru.kata.spring.boot_security.demo.models.User;
 import ru.kata.spring.boot_security.demo.services.UserService;
 
 import javax.transaction.Transactional;
 import java.security.Principal;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Controller
 @RequestMapping("/admin")
@@ -30,7 +34,9 @@ public class AdminController {
 
     @GetMapping(value = "/add")
     public String addUser(Model model) {
+        String role = "test";
         model.addAttribute("user", new User());
+        model.addAttribute("Role", role);
         return "add";
     }
 
